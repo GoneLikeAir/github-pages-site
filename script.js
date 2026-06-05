@@ -46,9 +46,7 @@ const deriveKey = async (password, salt, iterations) => {
 
 const decryptProtectedHtml = async (password) => {
   const payload = window.PROTECTED_PAYLOAD;
-  if (!payload) {
-    throw new Error("encrypted payload missing");
-  }
+  if (!payload) throw new Error("encrypted payload missing");
 
   const salt = fromBase64(payload.salt);
   const iv = fromBase64(payload.iv);
@@ -56,6 +54,46 @@ const decryptProtectedHtml = async (password) => {
   const key = await deriveKey(password, salt, payload.iterations);
   const plain = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, ciphertext);
   return new TextDecoder().decode(plain);
+};
+
+const escapeHtml = (value) =>
+  String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+
+const loadPageDirectory = async () => {
+  const mount = document.querySelector("[data-page-list]");
+  if (!mount) return;
+  try {
+    const response = await fetch("./manifest.json", { cache: "no-store" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const pages = await response.json();
+    if (!Array.isArray(pages) || pages.length === 0) {
+      mount.innerHTML = '<p class="muted">还没有发布页面。</p>';
+      return;
+    }
+    mount.innerHTML = pages
+      .map((page) => {
+        const title = escapeHtml(page.title || page.id || "Untitled");
+        const description = escapeHtml(page.description || "");
+        const createdAt = escapeHtml(page.createdAt || "");
+        const path = escapeHtml(page.path || "#");
+        return `<article class="page-card">
+          <div>
+            <p class="page-date">${createdAt}</p>
+            <h3>${title}</h3>
+            <p>${description}</p>
+          </div>
+          <a class="button secondary" href="${path}">打开页面</a>
+        </article>`;
+      })
+      .join("");
+  } catch (error) {
+    console.warn("Failed to load page directory", error);
+    mount.innerHTML = '<p class="auth-message" data-tone="error">页面目录加载失败。</p>';
+  }
 };
 
 const attachLockButtons = () => {
@@ -72,14 +110,13 @@ const showProtectedContent = (html) => {
   protectedContent.hidden = false;
   authShell.hidden = true;
   attachLockButtons();
+  loadPageDirectory();
   protectedContent.querySelector("#siteContent")?.focus();
 };
 
 const restoreSession = () => {
   const cachedHtml = sessionStorage.getItem(SESSION_KEY);
-  if (cachedHtml) {
-    showProtectedContent(cachedHtml);
-  }
+  if (cachedHtml) showProtectedContent(cachedHtml);
 };
 
 unlockForm?.addEventListener("submit", async (event) => {
@@ -87,7 +124,8 @@ unlockForm?.addEventListener("submit", async (event) => {
   const password = passwordInput.value;
   if (!password) return;
 
-  unlockForm.querySelector("button[type='submit']").disabled = true;
+  const submit = unlockForm.querySelector("button[type='submit']");
+  submit.disabled = true;
   setMessage("正在解密…");
 
   try {
@@ -100,7 +138,7 @@ unlockForm?.addEventListener("submit", async (event) => {
     passwordInput.value = "";
     passwordInput.focus();
   } finally {
-    unlockForm.querySelector("button[type='submit']").disabled = false;
+    submit.disabled = false;
   }
 });
 

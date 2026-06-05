@@ -1,31 +1,13 @@
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { webcrypto } from "node:crypto";
+import vm from "node:vm";
 
 const root = process.cwd();
 const text = (file) => readFileSync(join(root, file), "utf8");
-const fail = (message) => {
-  throw new Error(message);
-};
 const assert = (condition, message) => {
-  if (!condition) fail(message);
+  if (!condition) throw new Error(message);
 };
-
-const index = text("index.html");
-const script = text("script.js");
-const payload = text("encrypted-content.js");
-
-const fromCodes = (...codes) => String.fromCodePoint(...codes);
-const headingMarker = fromCodes(19968, 20010, 21487, 20197, 30452, 25509, 25176, 31649, 21040, 32, 71, 105, 116, 72, 117, 98, 32, 80, 97, 103, 101, 115, 32, 30340, 38745, 24577, 32593, 39029, 39033, 30446);
-const ledeMarker = fromCodes(36825, 26159, 19968, 20010, 38646, 26500, 24314, 12289, 38646, 21518, 31471, 30340, 32, 72, 84, 77, 76, 47, 67, 83, 83, 47, 74, 83, 32, 39033, 30446);
-const deployMarker = fromCodes(37096, 32626, 21040, 32, 71, 105, 116, 72, 117, 98, 32, 80, 97, 103, 101, 115);
-const protectedMarkers = [headingMarker, ledeMarker, deployMarker];
-
-for (const marker of protectedMarkers) {
-  assert(!index.includes(marker), `index.html still exposes protected marker: ${marker}`);
-  assert(!script.includes(marker), `script.js still exposes protected marker: ${marker}`);
-  assert(!payload.includes(marker), `encrypted-content.js still exposes protected marker: ${marker}`);
-}
 
 const filesToScan = [];
 const walk = (dir) => {
@@ -47,25 +29,72 @@ if (process.env.SITE_TEST_PASSWORD) {
   }
 }
 
+const index = text("index.html");
+const script = text("script.js");
+const payload = text("encrypted-content.js");
 assert(index.includes("id=\"unlockForm\""), "index.html should render an unlock form");
 assert(index.includes("id=\"protectedContent\""), "index.html should have protected content mount point");
 assert(index.includes("./encrypted-content.js"), "index.html should load encrypted payload before script.js");
 assert(script.includes("crypto.subtle"), "script.js should use Web Crypto");
 assert(script.includes("PBKDF2"), "script.js should derive a key with PBKDF2");
 assert(script.includes("AES-GCM"), "script.js should decrypt with AES-GCM");
+assert(script.includes("./manifest.json"), "script.js should load the page manifest");
 assert(payload.includes("window.PROTECTED_PAYLOAD"), "encrypted-content.js should define window.PROTECTED_PAYLOAD");
-assert(/ciphertext:\s*"[A-Za-z0-9+/=]+"/.test(payload), "encrypted payload should include base64 ciphertext");
+assert(/"ciphertext":\s*"[A-Za-z0-9+/=]+"/.test(payload), "encrypted homepage payload should include base64 ciphertext");
+
+let manifest = [];
+try {
+  manifest = JSON.parse(text("manifest.json"));
+} catch (error) {
+  throw new Error(`manifest.json missing or invalid: ${error.message}`);
+}
+assert(Array.isArray(manifest), "manifest.json should be an array");
+
+for (const item of manifest) {
+  assert(item.id && item.title && item.path, "manifest item should include id, title, path");
+  const pagePath = item.path.replace(/^\.\//, "");
+  const html = text(join(pagePath, "index.html"));
+  assert(html.includes("id=\"unlockForm\""), `${item.id} should render an unlock form`);
+  assert(html.includes("../../page-unlock.js"), `${item.id} should load page unlock script`);
+  assert(html.includes("window.PROTECTED_PAYLOAD"), `${item.id} should include encrypted payload`);
+  assert(!html.includes("<article class=\"article-wrap\""), `${item.id} appears to expose generated HTML directly`);
+}
 
 if (process.env.SITE_TEST_PASSWORD) {
-  const vm = await import("node:vm");
+  const homeData = readWindowPayload(payload);
+  const homeHtml = await decryptPayload(homeData, process.env.SITE_TEST_PASSWORD);
+  assert(homeHtml.includes("data-page-list"), "homepage password did not decrypt directory shell");
+
+  for (const item of manifest) {
+    const pagePath = item.path.replace(/^\.\//, "");
+    const html = text(join(pagePath, "index.html"));
+    const pageData = readInlinePayload(html);
+    const pageHtml = await decryptPayload(pageData, process.env.SITE_TEST_PASSWORD);
+    assert(pageHtml.includes("</html>"), `${item.id} did not decrypt to a complete HTML document`);
+    assert(pageHtml.includes(item.title), `${item.id} decrypted HTML does not contain its title`);
+  }
+}
+
+console.log("auth gate checks passed");
+
+function readWindowPayload(source) {
   const context = { window: {} };
-  vm.runInNewContext(payload, context);
-  const data = context.window.PROTECTED_PAYLOAD;
-  assert(data, "payload did not initialize");
+  vm.runInNewContext(source, context);
+  assert(context.window.PROTECTED_PAYLOAD, "payload did not initialize");
+  return context.window.PROTECTED_PAYLOAD;
+}
+
+function readInlinePayload(source) {
+  const match = source.match(/window\.PROTECTED_PAYLOAD\s*=\s*(\{[\s\S]*?\})\s*;\s*<\/script>/);
+  assert(match, "inline protected payload missing");
+  return JSON.parse(match[1]);
+}
+
+async function decryptPayload(data, password) {
   const fromBase64 = (value) => Buffer.from(value, "base64");
   const keyMaterial = await webcrypto.subtle.importKey(
     "raw",
-    new TextEncoder().encode(process.env.SITE_TEST_PASSWORD),
+    new TextEncoder().encode(password),
     "PBKDF2",
     false,
     ["deriveKey"],
@@ -87,8 +116,5 @@ if (process.env.SITE_TEST_PASSWORD) {
     key,
     fromBase64(data.ciphertext),
   );
-  const html = new TextDecoder().decode(plain);
-  assert(html.includes(headingMarker), "password did not decrypt expected content");
+  return new TextDecoder().decode(plain);
 }
-
-console.log("auth gate checks passed");
