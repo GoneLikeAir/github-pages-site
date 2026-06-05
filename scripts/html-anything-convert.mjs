@@ -1,22 +1,24 @@
 import { readFileSync, writeFileSync } from "node:fs";
 
-const [,, inputPath, outputPath] = process.argv;
-if (!inputPath || !outputPath) {
-  console.error("usage: node scripts/html-anything-convert.mjs <input.md> <output.html>");
-  process.exit(2);
+const { inputPath, outputPath, options } = parseArgs(process.argv.slice(2));
+if (!inputPath || !outputPath || options.help) {
+  console.error("usage: node scripts/html-anything-convert.mjs <input> <output.html> [--template=<id>] [--agent=<agent>] [--model=<model>] [--endpoint=<url>]");
+  process.exit(inputPath && outputPath ? 0 : 2);
 }
 
 const content = readFileSync(inputPath, "utf8");
-const response = await fetch("http://127.0.0.1:3001/api/convert", {
+const templateId = options.template || process.env.HTML_ANYTHING_TEMPLATE_ID || "article-magazine";
+const endpoint = options.endpoint || process.env.HTML_ANYTHING_CONVERT_URL || "http://127.0.0.1:3001/api/convert";
+const agent = options.agent || process.env.HTML_ANYTHING_AGENT || "codex";
+const model = options.model || process.env.HTML_ANYTHING_MODEL || "gpt-5.5";
+const format = options.format || detectFormat(inputPath);
+
+console.log(`template=${templateId}`);
+console.log(`format=${format}`);
+const response = await fetch(endpoint, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    agent: "codex",
-    model: "gpt-5.5",
-    templateId: "article-magazine",
-    format: "markdown",
-    content,
-  }),
+  body: JSON.stringify({ agent, model, templateId, format, content }),
 });
 
 if (!response.ok || !response.body) {
@@ -78,3 +80,25 @@ if (!started || !html.trim().startsWith("<") || !html.includes("</html>")) {
 }
 writeFileSync(outputPath, html, "utf8");
 console.log(`\nwrote ${outputPath} (${html.length} chars)`);
+
+function parseArgs(args) {
+  const positional = [];
+  const options = {};
+  for (const arg of args) {
+    if (arg === "--help") options.help = true;
+    else if (arg.startsWith("--")) {
+      const [key, ...rest] = arg.slice(2).split("=");
+      options[key] = rest.length ? rest.join("=") : true;
+    } else positional.push(arg);
+  }
+  return { inputPath: positional[0], outputPath: positional[1], options };
+}
+
+function detectFormat(filename) {
+  const lower = filename.toLowerCase();
+  if (lower.endsWith(".md") || lower.endsWith(".markdown") || lower.endsWith(".mdx")) return "markdown";
+  if (lower.endsWith(".csv")) return "csv";
+  if (lower.endsWith(".json") || lower.endsWith(".jsonl")) return "json";
+  if (lower.endsWith(".html") || lower.endsWith(".htm")) return "html";
+  return "text";
+}

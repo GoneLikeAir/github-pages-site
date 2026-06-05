@@ -28,20 +28,28 @@ http://127.0.0.1:8080
 
 ## 文档发布工作流
 
-示例：把 Markdown 文档转换成 HTML Anything 页面，并加密挂到项目目录下。
+现在推荐直接用自动化脚本：
 
 ```bash
-# 1. 用本地 HTML Anything 生成 HTML
-node scripts/html-anything-convert.mjs /path/to/input.md /tmp/output.html
+# 先看文档适合哪个 HTML Anything 模板
+node scripts/publish-document.mjs /path/to/input.md --dry-run
 
-# 2. 加密并发布到 pages/<slug>/，同时更新 manifest.json
-SITE_PAGE_PASSWORD='你的访问密码' PAGE_CREATED_AT='2026-06-05' \
-  node scripts/encrypt-doc-page.mjs /tmp/output.html wiki-index 'Wiki Index' '页面摘要'
+# 一键转换、加密、更新目录、验证、commit、push，并等待 GitHub Pages 部署
+SITE_PAGE_PASSWORD='你的访问密码' node scripts/publish-document.mjs /path/to/input.md
+```
 
-# 3. 如果修改了首页目录壳，重新生成首页密文
-SITE_PAGE_PASSWORD='你的访问密码' node scripts/encrypt-home.mjs
+模板索引和详细参数见：
 
-# 4. 验证
+```text
+docs/html-anything-template-index.md
+docs/publish-workflow.md
+```
+
+如果只想手动跑某一步，也可以使用：
+
+```bash
+node scripts/html-anything-convert.mjs /path/to/input.md /tmp/output.html --template=docs-page
+SITE_PAGE_PASSWORD='你的访问密码' node scripts/encrypt-doc-page.mjs /tmp/output.html wiki-index 'Wiki Index' '页面摘要'
 SITE_TEST_PASSWORD='你的访问密码' node scripts/verify-auth-gate.mjs
 ```
 
