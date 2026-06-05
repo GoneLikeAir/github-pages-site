@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import { basename, join } from "node:path";
 import { spawn } from "node:child_process";
-import { chooseTemplate, fetchTemplates, inferDocMeta, readTemplates, slugify } from "./template-tools.mjs";
+import { categoryLabel, chooseTemplate, fetchTemplates, inferDocMeta, inferPageCategory, inferPageTags, readTemplates, slugify } from "./template-tools.mjs";
 
 const args = parseArgs(process.argv.slice(2));
 if (!args.input || args.help) {
@@ -12,6 +12,8 @@ Options:
   --slug=<slug>            Override URL slug
   --description=<text>     Override manifest description
   --template=<id>          Override automatic template selection
+  --category=<id>          Override manifest category
+  --tags=<a,b,c>           Override manifest tags
   --no-commit              Convert/encrypt/verify only
   --no-push                Commit locally but do not push
   --no-watch-deploy        Do not wait for GitHub Pages run
@@ -30,12 +32,16 @@ const title = args.title || selected.title || inferred.title;
 const slug = slugify(args.slug || selected.slug || title);
 const description = args.description || selected.description || inferred.description;
 const templateId = args.template || selected.templateId;
+const category = args.category || inferPageCategory({ content, filename: inputPath, title, templateId });
+const tags = args.tags ? args.tags.split(",").map((tag) => tag.trim()).filter(Boolean) : inferPageTags({ content, title, templateId, category });
 
 console.log("select template");
 console.log(`  input: ${inputPath}`);
 console.log(`  title: ${title}`);
 console.log(`  slug: ${slug}`);
 console.log(`  template: ${templateId} (${selected.templateName || ""})`);
+console.log(`  category: ${category} (${categoryLabel(category)})`);
+console.log(`  tags: ${tags.join(", ") || "none"}`);
 console.log(`  reason: ${args.template ? "manual override" : selected.reason}`);
 
 if (args.dryRun) process.exit(0);
@@ -52,7 +58,7 @@ const generatedHtml = join(".publish-cache", `${slug}.html`);
 await run("node", ["scripts/html-anything-convert.mjs", inputPath, generatedHtml, `--template=${templateId}`], { label: "convert with HTML Anything" });
 await run("node", ["scripts/encrypt-doc-page.mjs", generatedHtml, slug, title, description], {
   label: "encrypt page",
-  env: { SITE_PAGE_PASSWORD: password },
+  env: { SITE_PAGE_PASSWORD: password, PAGE_CATEGORY: category, PAGE_CATEGORY_LABEL: categoryLabel(category), PAGE_TEMPLATE_ID: templateId, PAGE_TAGS: tags.join(",") },
 });
 
 await run("node", ["scripts/verify-auth-gate.mjs"], {

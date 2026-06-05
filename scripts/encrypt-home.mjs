@@ -7,76 +7,88 @@ if (!password) {
   process.exit(2);
 }
 
-const homeHtml = `<main class="portal-shell" id="siteContent" tabindex="-1">
+const homeHtml = `<main class="portal-shell library-shell" id="siteContent" tabindex="-1">
   <nav class="site-nav" aria-label="主导航">
     <a class="brand-mark" href="./" aria-label="返回首页">
       <span class="brand-dot"></span>
       <span>GoneLikeAir Pages</span>
     </a>
     <div class="nav-links">
-      <a href="#pageDirectory">页面</a>
-      <a href="#workflow">工作流</a>
+      <a href="#pageDirectory">文档库</a>
+      <a href="#workflow">发布流程</a>
       <button type="button" data-lock-button>退出</button>
     </div>
   </nav>
 
-  <section class="portal-hero">
-    <div class="hero-copy">
-      <p class="section-kicker">HTML Anything × GitHub Pages</p>
-      <h1>一座只给知道密码的人看的文档展厅。</h1>
-      <p class="lede">把文档交给本地 HTML Anything 生成页面，再加密挂到 GitHub Pages；主页只负责安全地组织入口。</p>
-      <div class="hero-actions">
-        <a class="button primary" href="#pageDirectory">打开目录</a>
-        <a class="button secondary" href="#workflow">查看流程</a>
-      </div>
+  <section class="library-hero" aria-labelledby="libraryTitle">
+    <div class="library-copy">
+      <p class="section-kicker">Encrypted document library</p>
+      <h1 id="libraryTitle">先选分类，再打开页面。</h1>
+      <p class="lede">HTML Anything 生成的页面会进入分类文档库；主页不再把入口藏在长滚动后面。</p>
+      <form class="library-search" role="search" aria-label="搜索已发布页面">
+        <label class="sr-only" for="pageSearch">搜索页面</label>
+        <input id="pageSearch" data-page-search type="search" autocomplete="off" placeholder="搜索标题、描述或分类…" />
+      </form>
     </div>
-    <div class="hero-board" aria-label="当前发布状态">
-      <div class="board-header">
-        <span>publish pipeline</span>
-        <strong>static / encrypted</strong>
+    <aside class="library-status" aria-label="文档库状态">
+      <div class="metric-card primary-metric">
+        <span>pages</span>
+        <strong data-total-pages>—</strong>
+        <small>已发布加密页面</small>
       </div>
-      <div class="board-row">
-        <span>01</span>
-        <p>Document received</p>
+      <div class="metric-card">
+        <span>categories</span>
+        <strong data-category-count>—</strong>
+        <small>自动分类维护</small>
       </div>
-      <div class="board-row">
-        <span>02</span>
-        <p>Rendered by HTML Anything</p>
+      <div class="latest-card">
+        <span>latest</span>
+        <strong data-latest-page>正在读取目录…</strong>
+        <small data-updated-at>manifest.json</small>
       </div>
-      <div class="board-row emphasis">
-        <span>03</span>
-        <p>Encrypted page mounted</p>
+    </aside>
+  </section>
+
+  <section class="library-console" id="pageDirectory" aria-label="已发布页面目录">
+    <aside class="category-rail" aria-label="页面分类">
+      <div class="rail-heading">
+        <span>分类</span>
+        <small>自动归档</small>
+      </div>
+      <div class="category-list" data-category-list>
+        <button class="category-pill is-active" type="button">全部</button>
+      </div>
+    </aside>
+    <div class="directory-panel">
+      <div class="directory-header">
+        <div>
+          <p class="section-kicker">Published pages</p>
+          <h2>页面入口</h2>
+        </div>
+        <p>每个页面独立加密；同一标签页输入一次密码后，进入子页面会自动解锁。</p>
+      </div>
+      <div class="page-list grouped-page-list" data-page-list>
+        <p class="muted">正在加载页面目录…</p>
       </div>
     </div>
   </section>
 
-  <section class="workflow-strip" id="workflow" aria-label="工作流">
+  <section class="workflow-strip compact-workflow" id="workflow" aria-label="工作流">
+    <article>
+      <span>Classify</span>
+      <strong>自动归档</strong>
+      <p>发布脚本根据模板和内容写入 category / tags，主页按分类维护入口。</p>
+    </article>
     <article>
       <span>Generate</span>
       <strong>HTML Anything</strong>
-      <p>本地 agent 生成完整 HTML 页面。</p>
-    </article>
-    <article>
-      <span>Encrypt</span>
-      <strong>AES-GCM</strong>
-      <p>正文变成密文，浏览器输入密码后解锁。</p>
+      <p>根据文档类型选择模板，生成可独立打开的静态 HTML 页面。</p>
     </article>
     <article>
       <span>Publish</span>
       <strong>GitHub Pages</strong>
-      <p>以项目页方式托管，目录自动追加入口。</p>
+      <p>目录和每个页面正文都以密文保存，浏览器本地解锁。</p>
     </article>
-  </section>
-
-  <section class="published-grid" id="pageDirectory">
-    <div class="section-header">
-      <p class="section-kicker">Published pages</p>
-      <h2>已发布页面</h2>
-      <p>每个条目都是独立加密页面。点击后会进入该页面自己的密码门。</p>
-    </div>
-    <div class="page-list" data-page-list>
-      <p class="muted">正在加载页面目录…</p>
-    </div>
   </section>
 </main>`;
 

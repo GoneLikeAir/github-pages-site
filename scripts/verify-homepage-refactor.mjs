@@ -17,10 +17,12 @@ if (!payload) throw new Error("homepage payload missing");
 const html = await decrypt(payload, password);
 const mustInclude = [
   'class="site-nav"',
-  'class="portal-hero"',
-  'class="workflow-strip"',
-  'class="published-grid"',
+  'class="library-hero"',
+  'class="library-console"',
+  'class="workflow-strip compact-workflow"',
   'data-page-list',
+  'data-category-list',
+  'data-page-search',
   'HTML Anything',
   'GitHub Pages',
 ];
@@ -34,7 +36,7 @@ for (const marker of ["access-shell", "lock-visual", "private document portal"])
 }
 
 const styles = readFileSync("styles.css", "utf8");
-for (const marker of [".site-nav", ".portal-hero", ".workflow-strip", ".published-grid", ".lock-visual"]) {
+for (const marker of [".site-nav", ".library-hero", ".library-console", ".category-rail", ".directory-panel", ".workflow-strip", ".lock-visual"]) {
   if (!styles.includes(marker)) throw new Error(`styles missing marker: ${marker}`);
 }
 

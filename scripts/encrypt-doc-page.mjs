@@ -17,6 +17,10 @@ if (!password) {
 const root = process.cwd();
 const createdAt = process.env.PAGE_CREATED_AT || new Date().toISOString().slice(0, 10);
 const sourceHtml = readFileSync(inputHtmlPath, "utf8");
+const category = process.env.PAGE_CATEGORY || "uncategorized";
+const categoryLabel = process.env.PAGE_CATEGORY_LABEL || "未分类";
+const templateId = process.env.PAGE_TEMPLATE_ID || "";
+const tags = (process.env.PAGE_TAGS || "").split(",").map((tag) => tag.trim()).filter(Boolean);
 const encoder = new TextEncoder();
 
 async function encryptHtml(html) {
@@ -111,6 +115,10 @@ manifest.unshift({
   createdAt,
   source: inputHtmlPath.split("/").pop(),
   encrypted: true,
+  category,
+  categoryLabel,
+  templateId,
+  tags,
 });
 writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
 console.log(`published pages/${slug}/index.html`);

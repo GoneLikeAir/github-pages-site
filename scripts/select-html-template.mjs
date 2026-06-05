@@ -1,5 +1,5 @@
 import { existsSync, readFileSync } from "node:fs";
-import { chooseTemplate, fetchTemplates, inferDocMeta, readTemplates } from "./template-tools.mjs";
+import { categoryLabel, chooseTemplate, fetchTemplates, inferDocMeta, inferPageCategory, inferPageTags, readTemplates } from "./template-tools.mjs";
 
 const [inputPath, ...rest] = process.argv.slice(2);
 if (!inputPath || rest.includes("--help")) {
@@ -15,7 +15,8 @@ const templates = existsSync(templatePath)
   : await fetchTemplates(options.endpoint || process.env.HTML_ANYTHING_TEMPLATES_URL || "http://127.0.0.1:3001/api/templates");
 const selection = chooseTemplate({ content, filename: inputPath, templates });
 const meta = inferDocMeta(content, inputPath);
-const result = { ...meta, ...selection };
+const category = inferPageCategory({ content, filename: inputPath, title: selection.title || meta.title, templateId: selection.templateId });
+const result = { ...meta, ...selection, category, categoryLabel: categoryLabel(category), tags: inferPageTags({ content, title: selection.title || meta.title, templateId: selection.templateId, category }) };
 
 if (options.json || options["json"] === true) {
   console.log(JSON.stringify(result, null, 2));

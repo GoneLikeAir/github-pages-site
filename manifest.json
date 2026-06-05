@@ -2,11 +2,19 @@
   {
     "id": "windows-codex-gpt-5-5",
     "title": "Windows 安装 Codex 桌面版，并配置中转服务的 GPT-5.5 模型",
-    "description": "<quote-container",
+    "description": "Windows 安装 Codex 桌面版，并配置中转服务 GPT-5.5 的完整教程。",
     "path": "./pages/windows-codex-gpt-5-5/",
     "createdAt": "2026-06-05",
     "source": "windows-codex-gpt-5-5.html",
-    "encrypted": true
+    "encrypted": true,
+    "category": "setup-guides",
+    "categoryLabel": "安装配置",
+    "templateId": "docs-page",
+    "tags": [
+      "Codex",
+      "Windows",
+      "中转服务"
+    ]
   },
   {
     "id": "wiki-index",
@@ -15,6 +23,14 @@
     "path": "./pages/wiki-index/",
     "createdAt": "2026-06-05",
     "source": "wiki-index-html-anything.html",
-    "encrypted": true
+    "encrypted": true,
+    "category": "trading-wiki",
+    "categoryLabel": "交易体系",
+    "templateId": "docs-page",
+    "tags": [
+      "Wiki",
+      "交易体系",
+      "索引"
+    ]
   }
 ]

@@ -1,9 +1,12 @@
 import { readFileSync } from "node:fs";
 import {
+  categoryLabel,
   chooseTemplate,
   detectFormat,
   formatTemplateIndexMarkdown,
   inferDocMeta,
+  inferPageCategory,
+  inferPageTags,
   slugify,
 } from "./template-tools.mjs";
 
@@ -20,6 +23,10 @@ assert(slugify("Wiki Index：交易体系总览") === "wiki-index-jiao-yi-ti-xi-
 assert(detectFormat("notes.md") === "markdown", "detect markdown format");
 assert(detectFormat("metrics.csv") === "csv", "detect csv format");
 assert(inferDocMeta("# 会议纪要\n\n下次 action items", "meeting.md").title === "会议纪要", "infer title from h1");
+assert(inferPageCategory({ content: "Windows 安装 Codex", title: "Codex setup", templateId: "docs-page" }) === "setup-guides", "infer setup guide category");
+assert(inferPageCategory({ content: "交易体系 Wiki Index", title: "Wiki Index", templateId: "docs-page" }) === "trading-wiki", "infer trading wiki category");
+assert(categoryLabel("setup-guides") === "安装配置", "category label should be localized");
+assert(inferPageTags({ content: "GitHub Pages with HTML Anything", title: "Workflow", templateId: "docs-page", category: "technical-docs" }).includes("HTML Anything"), "infer page tags");
 
 const cases = [
   ["api-doc", "# API Reference\n\n## Endpoint\nGET /v1/users\n\n## Parameters", "api.md", "docs-page"],
@@ -41,7 +48,7 @@ for (const marker of ["# HTML Anything 模板小索引", "## article", "## doc",
 }
 
 const publishScript = readFileSync("scripts/publish-document.mjs", "utf8");
-for (const marker of ["SITE_PAGE_PASSWORD", "select", "git push", "retry", "gh run watch", "verify-auth-gate.mjs"]) {
+for (const marker of ["SITE_PAGE_PASSWORD", "PAGE_CATEGORY", "PAGE_TAGS", "select", "git push", "retry", "gh run watch", "verify-auth-gate.mjs"]) {
   assert(publishScript.includes(marker), `publish script missing ${marker}`);
 }
 

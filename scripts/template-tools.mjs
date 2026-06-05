@@ -64,6 +64,57 @@ export function inferDocMeta(content, filename = "document") {
   };
 }
 
+export const CATEGORY_LABELS = {
+  "setup-guides": "安装配置",
+  "trading-wiki": "交易体系",
+  "technical-docs": "技术文档",
+  "research-reports": "研究报告",
+  "meeting-notes": "会议纪要",
+  "product-specs": "产品方案",
+  "data-reports": "数据报告",
+  articles: "文章长文",
+  uncategorized: "未分类",
+};
+
+export function inferPageCategory({ content = "", filename = "", title = "", templateId = "" } = {}) {
+  const haystack = `${content}\n${filename}\n${title}\n${templateId}`.toLowerCase();
+  if (/windows|codex|安装|配置|setup|install|desktop/.test(haystack)) return "setup-guides";
+  if (/wiki|交易|股票|复盘|watchlist|strategy|3l/.test(haystack)) return "trading-wiki";
+  if (/meeting|会议|纪要|action/.test(haystack) || templateId === "meeting-notes") return "meeting-notes";
+  if (/prd|产品|需求|spec/.test(haystack) || templateId === "pm-spec") return "product-specs";
+  if (/data|report|csv|指标|数据/.test(haystack) || templateId === "data-report") return "data-reports";
+  if (/research|调研|分析|报告|finance/.test(haystack) || templateId === "finance-report") return "research-reports";
+  if (/docs|api|runbook|技术|文档|目录|索引/.test(haystack) || ["docs-page", "eng-runbook"].includes(templateId)) return "technical-docs";
+  if (/article|blog|essay|长文|观点/.test(haystack) || ["article-magazine", "blog-post"].includes(templateId)) return "articles";
+  return "uncategorized";
+}
+
+export function categoryLabel(category) {
+  return CATEGORY_LABELS[category] || category || CATEGORY_LABELS.uncategorized;
+}
+
+export function inferPageTags({ content = "", title = "", templateId = "", category = "" } = {}) {
+  const haystack = `${title}\n${content}`.toLowerCase();
+  const tags = new Set();
+  if (templateId) tags.add(templateId);
+  if (category && category !== "uncategorized") tags.add(categoryLabel(category));
+  const keywordTags = [
+    ["Codex", /codex/],
+    ["Windows", /windows/],
+    ["GitHub Pages", /github pages/],
+    ["HTML Anything", /html anything/],
+    ["Wiki", /wiki|索引/],
+    ["交易体系", /交易|股票|复盘|3l/],
+    ["API", /api|endpoint|接口/],
+    ["会议", /会议|meeting/],
+    ["数据", /数据|csv|指标/],
+  ];
+  for (const [tag, pattern] of keywordTags) {
+    if (pattern.test(haystack)) tags.add(tag);
+  }
+  return Array.from(tags).slice(0, 5);
+}
+
 export function extractTitle(content, filename = "document") {
   const h1 = String(content).match(/^#\s+(.+)$/m)?.[1]?.trim();
   if (h1) return stripMarkdown(h1).slice(0, 80);
