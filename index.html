@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="一个可直接部署到 GitHub Pages 的静态网页模板。" />
+  <title>GitHub Pages Starter</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <p class="eyebrow">GitHub Pages Starter</p>
+      <h1>一个可以直接托管到 GitHub Pages 的静态网页项目</h1>
+      <p class="lede">
+        这是一个零构建、零后端的 HTML/CSS/JS 项目。推到 GitHub 后，开启 Pages 即可在线访问。
+      </p>
+      <div class="actions">
+        <a class="button primary" href="https://pages.github.com/" target="_blank" rel="noreferrer">查看 GitHub Pages</a>
+        <a class="button secondary" href="#deploy">部署步骤</a>
+      </div>
+    </section>
+
+    <section class="cards" aria-label="项目特性">
+      <article class="card">
+        <span class="icon">⚡</span>
+        <h2>无需构建</h2>
+        <p>直接由浏览器加载 <code>index.html</code>、<code>styles.css</code> 和 <code>script.js</code>。</p>
+      </article>
+      <article class="card">
+        <span class="icon">🌐</span>
+        <h2>适合 Pages</h2>
+        <p>仓库推送后，可以用 GitHub Pages 的 branch source 或 Actions 部署。</p>
+      </article>
+      <article class="card">
+        <span class="icon">🧩</span>
+        <h2>易于扩展</h2>
+        <p>可以替换成 HTML Anything 导出的页面，也可以继续添加更多页面和资源。</p>
+      </article>
+    </section>
+
+    <section id="deploy" class="panel">
+      <h2>部署到 GitHub Pages</h2>
+      <ol>
+        <li>在 GitHub 创建一个公开仓库，比如 <code>github-pages-site</code>。</li>
+        <li>把本项目 push 到仓库的 <code>main</code> 分支。</li>
+        <li>进入仓库 <strong>Settings → Pages</strong>。</li>
+        <li>选择 <strong>Deploy from a branch</strong>，分支选 <code>main</code>，目录选 <code>/root</code>。</li>
+      </ol>
+      <p class="note">如果仓库名是 <code>GoneLikeAir.github.io</code>，访问地址是 <code>https://GoneLikeAir.github.io</code>；普通项目仓库则是 <code>https://GoneLikeAir.github.io/仓库名/</code>。</p>
+    </section>
+  </main>
+
+  <script src="./script.js"></script>
+</body>
+</html>
