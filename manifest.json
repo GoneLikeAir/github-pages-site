@@ -2,7 +2,7 @@
   {
     "id": "windows-codex-gpt-5-5",
     "title": "Windows 安装 Codex 桌面版，并配置中转服务的 GPT-5.5 模型",
-    "description": "Windows 上安装 Codex Desktop / Codex CLI，并配置 OpenAI 兼容中转服务使用 GPT-5.5 的完整教程。",
+    "description": "<quote-container",
     "path": "./pages/windows-codex-gpt-5-5/",
     "createdAt": "2026-06-05",
     "source": "windows-codex-gpt-5-5.html",
