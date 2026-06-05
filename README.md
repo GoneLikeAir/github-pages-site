@@ -7,17 +7,9 @@
 - 个人主页仓库名必须是 `<用户名>.github.io`，访问地址是 `https://<用户名>.github.io/`
 - 项目网页仓库名可以是普通项目名，比如 `github-pages-site`，访问地址是 `https://<用户名>.github.io/<仓库名>/`
 
-本项目走的是**项目网页**方案，推荐远程仓库名：
+本项目当前启用了纯前端加密密码门：公开部署出去的 `index.html` 只显示解锁表单，实际页面正文被 AES-GCM 加密后保存在 `encrypted-content.js`。浏览器输入正确访问密码后，才会在前端解密并显示页面内容。
 
-```text
-github-pages-site
-```
-
-部署后访问地址通常是：
-
-```text
-https://GoneLikeAir.github.io/github-pages-site/
-```
+注意：这不是服务器鉴权，适合降低公开暴露；如果要真正的用户权限控制，需要迁移到带后端/边缘鉴权的平台。
 
 ## 本地预览
 
