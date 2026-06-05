@@ -4,15 +4,16 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="一个受密码保护的 GitHub Pages 项目网页。" />
-  <title>GitHub Pages Starter</title>
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Private document portal</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-  <main class="shell lock-shell" id="authShell">
-    <section class="hero lock-card" aria-labelledby="authTitle">
-      <p class="eyebrow">Private Project Page</p>
-      <h1 id="authTitle">请输入访问密码</h1>
-      <p class="lede">这个 GitHub Pages 项目网页使用前端加密密码门。未解锁前，正文内容只以密文形式保存在静态文件中。</p>
+  <main class="access-shell" id="authShell">
+    <section class="access-copy" aria-labelledby="authTitle">
+      <p class="eyebrow">private document portal</p>
+      <h1 id="authTitle">解锁文档页面目录</h1>
+      <p class="lede">HTML Anything 负责生成页面，GitHub Pages 负责托管；目录和正文都先加密，再在浏览器本地解锁。</p>
 
       <form class="unlock-form" id="unlockForm" autocomplete="off">
         <label class="password-label" for="passwordInput">访问密码</label>
@@ -22,9 +23,32 @@
         </div>
         <p class="auth-message" id="authMessage" role="status" aria-live="polite"></p>
       </form>
-
-      <p class="note">提示：这是纯前端加密门，不等同于服务器鉴权；适合降低公开暴露，不适合放高度敏感资料。</p>
     </section>
+
+    <aside class="lock-visual" aria-label="发布工作流示意">
+      <div class="visual-topline">
+        <span>encrypted static workflow</span>
+        <span>v1</span>
+      </div>
+      <div class="route-stack">
+        <div class="route-card active">
+          <span class="route-index">01</span>
+          <strong>Document input</strong>
+          <small>Markdown / notes / long-form files</small>
+        </div>
+        <div class="route-card">
+          <span class="route-index">02</span>
+          <strong>HTML Anything render</strong>
+          <small>Designed HTML from local agent</small>
+        </div>
+        <div class="route-card">
+          <span class="route-index">03</span>
+          <strong>Encrypted Pages</strong>
+          <small>Navigation + per-page password gates</small>
+        </div>
+      </div>
+      <p class="note">纯前端加密门不是服务器鉴权，但能避免页面正文直接暴露在静态 HTML 中。</p>
+    </aside>
   </main>
 
   <div id="protectedContent" hidden></div>
