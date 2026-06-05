@@ -1,10 +1,27 @@
-# GitHub Pages Starter
+# GoneLikeAir.github.io
 
-这是一个放在 `/Users/gone/alexli/work/code/github-pages-site` 下的静态网页项目，可直接用于 GitHub Pages。
+这是 GitHub 用户主页仓库模板。因为 GitHub Pages 的**个人主页**有固定命名要求，仓库名必须是：
+
+```text
+GoneLikeAir.github.io
+```
+
+本地项目目录也对应调整为：
+
+```text
+/Users/gone/alexli/work/code/GoneLikeAir.github.io
+```
+
+部署后访问地址是：
+
+```text
+https://GoneLikeAir.github.io
+```
 
 ## 本地预览
 
 ```bash
+cd /Users/gone/alexli/work/code/GoneLikeAir.github.io
 python3 -m http.server 8080
 ```
 
@@ -14,35 +31,28 @@ python3 -m http.server 8080
 http://127.0.0.1:8080
 ```
 
-## 推送到 GitHub 并开启 Pages
+## 推送到 GitHub
 
-如果你想创建普通项目页：
+先登录 GitHub CLI：
 
 ```bash
 gh auth login
-gh repo create GoneLikeAir/github-pages-site --public --source . --push
 ```
 
-然后进入 GitHub 仓库：
+然后在本目录执行：
 
-```text
-Settings → Pages → Deploy from a branch → main / root
+```bash
+gh repo create GoneLikeAir/GoneLikeAir.github.io --public --source . --push
 ```
 
-访问地址通常是：
+如果 GitHub 没有自动启用 Pages，可以进入仓库：
 
 ```text
-https://GoneLikeAir.github.io/github-pages-site/
+Settings → Pages
 ```
 
-如果你想做个人主页，把仓库名改成：
+个人主页仓库通常可以直接从 `main` 分支或 GitHub Actions 部署。本项目已包含 `.github/workflows/deploy.yml`，也可以选择：
 
 ```text
-GoneLikeAir.github.io
-```
-
-访问地址就是：
-
-```text
-https://GoneLikeAir.github.io
+Source → GitHub Actions
 ```
