@@ -65,6 +65,11 @@ const pageUnlockScript = text("page-unlock.js");
 assert(pageUnlockScript.includes("github_pages_site_passphrase_v1"), "page-unlock.js should reuse the shared session passphrase");
 assert(pageUnlockScript.includes("正在自动解锁"), "page-unlock.js should attempt automatic unlock from shared session");
 
+const styles = text("styles.css");
+assert(/\.doc-frame-shell\s*\{[\s\S]*?position:\s*fixed;[\s\S]*?inset:\s*0;/.test(styles), "unlocked document shell should fill the viewport");
+assert(/#docFrame\s*\{[\s\S]*?width:\s*100vw;[\s\S]*?height:\s*100dvh;[\s\S]*?border:\s*0;/.test(styles), "unlocked document iframe should render fullscreen without frame chrome");
+assert(/\.doc-toolbar\s*\{[\s\S]*?position:\s*fixed;/.test(styles), "document toolbar should float over fullscreen content instead of taking layout space");
+
 if (process.env.SITE_TEST_PASSWORD) {
   const homeData = readWindowPayload(payload);
   const homeHtml = await decryptPayload(homeData, process.env.SITE_TEST_PASSWORD);
