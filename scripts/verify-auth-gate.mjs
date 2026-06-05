@@ -39,6 +39,7 @@ assert(script.includes("crypto.subtle"), "script.js should use Web Crypto");
 assert(script.includes("PBKDF2"), "script.js should derive a key with PBKDF2");
 assert(script.includes("AES-GCM"), "script.js should decrypt with AES-GCM");
 assert(script.includes("./manifest.json"), "script.js should load the page manifest");
+assert(script.includes("github_pages_site_passphrase_v1"), "script.js should cache the shared session passphrase after unlock");
 assert(payload.includes("window.PROTECTED_PAYLOAD"), "encrypted-content.js should define window.PROTECTED_PAYLOAD");
 assert(/"ciphertext":\s*"[A-Za-z0-9+/=]+"/.test(payload), "encrypted homepage payload should include base64 ciphertext");
 
@@ -59,6 +60,10 @@ for (const item of manifest) {
   assert(html.includes("window.PROTECTED_PAYLOAD"), `${item.id} should include encrypted payload`);
   assert(!html.includes("<article class=\"article-wrap\""), `${item.id} appears to expose generated HTML directly`);
 }
+
+const pageUnlockScript = text("page-unlock.js");
+assert(pageUnlockScript.includes("github_pages_site_passphrase_v1"), "page-unlock.js should reuse the shared session passphrase");
+assert(pageUnlockScript.includes("正在自动解锁"), "page-unlock.js should attempt automatic unlock from shared session");
 
 if (process.env.SITE_TEST_PASSWORD) {
   const homeData = readWindowPayload(payload);

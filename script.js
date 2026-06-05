@@ -1,4 +1,6 @@
 const SESSION_KEY = "github_pages_site_unlocked_html_v1";
+const SHARED_PASSPHRASE_KEY = "github_pages_site_passphrase_v1";
+const DOC_SESSION_PREFIX = "github_pages_doc_unlocked:";
 
 const authShell = document.querySelector("#authShell");
 const unlockForm = document.querySelector("#unlockForm");
@@ -99,9 +101,19 @@ const loadPageDirectory = async () => {
 const attachLockButtons = () => {
   for (const button of document.querySelectorAll("[data-lock-button]")) {
     button.addEventListener("click", () => {
-      sessionStorage.removeItem(SESSION_KEY);
+      clearSiteSession();
       window.location.reload();
     });
+  }
+};
+
+const clearSiteSession = () => {
+  sessionStorage.removeItem(SESSION_KEY);
+  sessionStorage.removeItem(SHARED_PASSPHRASE_KEY);
+  if (typeof sessionStorage.length !== "number" || typeof sessionStorage.key !== "function") return;
+  for (let index = sessionStorage.length - 1; index >= 0; index -= 1) {
+    const key = sessionStorage.key(index);
+    if (key?.startsWith(DOC_SESSION_PREFIX)) sessionStorage.removeItem(key);
   }
 };
 
@@ -114,9 +126,30 @@ const showProtectedContent = (html) => {
   protectedContent.querySelector("#siteContent")?.focus();
 };
 
-const restoreSession = () => {
+const unlockWithPassword = async (password, { rememberPassword = false, silent = false } = {}) => {
+  if (!silent) setMessage("正在解密…");
+  const html = await decryptProtectedHtml(password);
+  sessionStorage.setItem(SESSION_KEY, html);
+  if (rememberPassword) sessionStorage.setItem(SHARED_PASSPHRASE_KEY, password);
+  showProtectedContent(html);
+};
+
+const restoreSession = async () => {
   const cachedHtml = sessionStorage.getItem(SESSION_KEY);
-  if (cachedHtml) showProtectedContent(cachedHtml);
+  if (cachedHtml) {
+    showProtectedContent(cachedHtml);
+    return;
+  }
+
+  const savedPassword = sessionStorage.getItem(SHARED_PASSPHRASE_KEY);
+  if (!savedPassword) return;
+
+  try {
+    await unlockWithPassword(savedPassword, { silent: true });
+  } catch (error) {
+    console.warn("Failed to restore protected homepage", error);
+    sessionStorage.removeItem(SHARED_PASSPHRASE_KEY);
+  }
 };
 
 unlockForm?.addEventListener("submit", async (event) => {
@@ -129,9 +162,7 @@ unlockForm?.addEventListener("submit", async (event) => {
   setMessage("正在解密…");
 
   try {
-    const html = await decryptProtectedHtml(password);
-    sessionStorage.setItem(SESSION_KEY, html);
-    showProtectedContent(html);
+    await unlockWithPassword(password, { rememberPassword: true });
   } catch (error) {
     console.warn("Failed to unlock protected page", error);
     setMessage("密码不正确，或者页面密文已损坏。", "error");

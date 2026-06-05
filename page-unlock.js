@@ -1,4 +1,7 @@
 const PAGE_SESSION_KEY = `github_pages_doc_unlocked:${location.pathname}`;
+const HOME_SESSION_KEY = "github_pages_site_unlocked_html_v1";
+const SHARED_PASSPHRASE_KEY = "github_pages_site_passphrase_v1";
+const DOC_SESSION_PREFIX = "github_pages_doc_unlocked:";
 
 const authShell = document.querySelector("#authShell");
 const docShell = document.querySelector("#docShell");
@@ -59,6 +62,27 @@ const showDoc = (html) => {
   authShell.hidden = true;
 };
 
+const clearSiteSession = () => {
+  sessionStorage.removeItem(HOME_SESSION_KEY);
+  sessionStorage.removeItem(SHARED_PASSPHRASE_KEY);
+  if (typeof sessionStorage.length === "number" && typeof sessionStorage.key === "function") {
+    for (let index = sessionStorage.length - 1; index >= 0; index -= 1) {
+      const key = sessionStorage.key(index);
+      if (key?.startsWith(DOC_SESSION_PREFIX)) sessionStorage.removeItem(key);
+    }
+  } else {
+    sessionStorage.removeItem(PAGE_SESSION_KEY);
+  }
+};
+
+const unlockWithPassword = async (password, { rememberPassword = false, silent = false } = {}) => {
+  if (!silent) setMessage("正在解密…");
+  const html = await decryptProtectedHtml(password);
+  sessionStorage.setItem(PAGE_SESSION_KEY, html);
+  if (rememberPassword) sessionStorage.setItem(SHARED_PASSPHRASE_KEY, password);
+  showDoc(html);
+};
+
 unlockForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
   const password = passwordInput.value;
@@ -67,9 +91,7 @@ unlockForm?.addEventListener("submit", async (event) => {
   submit.disabled = true;
   setMessage("正在解密…");
   try {
-    const html = await decryptProtectedHtml(password);
-    sessionStorage.setItem(PAGE_SESSION_KEY, html);
-    showDoc(html);
+    await unlockWithPassword(password, { rememberPassword: true });
   } catch (error) {
     console.warn("Failed to unlock encrypted page", error);
     setMessage("密码不正确，或者页面密文已损坏。", "error");
@@ -81,9 +103,21 @@ unlockForm?.addEventListener("submit", async (event) => {
 });
 
 lockButton?.addEventListener("click", () => {
-  sessionStorage.removeItem(PAGE_SESSION_KEY);
+  clearSiteSession();
   location.reload();
 });
 
 const cachedHtml = sessionStorage.getItem(PAGE_SESSION_KEY);
-if (cachedHtml) showDoc(cachedHtml);
+if (cachedHtml) {
+  showDoc(cachedHtml);
+} else {
+  const savedPassword = sessionStorage.getItem(SHARED_PASSPHRASE_KEY);
+  if (savedPassword) {
+    setMessage("正在自动解锁…");
+    unlockWithPassword(savedPassword, { silent: true }).catch((error) => {
+      console.warn("Failed to restore encrypted page", error);
+      sessionStorage.removeItem(SHARED_PASSPHRASE_KEY);
+      setMessage("需要重新输入访问密码。", "muted");
+    });
+  }
+}
