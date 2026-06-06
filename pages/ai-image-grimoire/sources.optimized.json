@@ -1,0 +1,86 @@
+[
+  {
+    "title": "提示词解剖",
+    "file": "assets/01_prompt_anatomy.png",
+    "bytes": 3057636,
+    "optimizedFile": "assets_optimized/01_prompt_anatomy.webp",
+    "optimizedBytes": 350992
+  },
+  {
+    "title": "构图与三分法",
+    "file": "assets/02_composition.png",
+    "bytes": 2415512,
+    "optimizedFile": "assets_optimized/02_composition.webp",
+    "optimizedBytes": 256698
+  },
+  {
+    "title": "光线",
+    "file": "assets/03_lighting.png",
+    "bytes": 2839758,
+    "optimizedFile": "assets_optimized/03_lighting.webp",
+    "optimizedBytes": 300978
+  },
+  {
+    "title": "色彩",
+    "file": "assets/04_color.png",
+    "bytes": 3580898,
+    "optimizedFile": "assets_optimized/04_color.webp",
+    "optimizedBytes": 482610
+  },
+  {
+    "title": "镜头与景深",
+    "file": "assets/05_lens_dof.png",
+    "bytes": 2096516,
+    "optimizedFile": "assets_optimized/05_lens_dof.webp",
+    "optimizedBytes": 129000
+  },
+  {
+    "title": "材质",
+    "file": "assets/06_texture.png",
+    "bytes": 2789409,
+    "optimizedFile": "assets_optimized/06_texture.webp",
+    "optimizedBytes": 298850
+  },
+  {
+    "title": "电影摄影",
+    "file": "assets/07_cinematic.png",
+    "bytes": 2588408,
+    "optimizedFile": "assets_optimized/07_cinematic.webp",
+    "optimizedBytes": 242516
+  },
+  {
+    "title": "水墨水彩",
+    "file": "assets/08_ink_watercolor.png",
+    "bytes": 3259391,
+    "optimizedFile": "assets_optimized/08_ink_watercolor.webp",
+    "optimizedBytes": 304922
+  },
+  {
+    "title": "3D潮玩",
+    "file": "assets/09_3d_toy.png",
+    "bytes": 2240696,
+    "optimizedFile": "assets_optimized/09_3d_toy.webp",
+    "optimizedBytes": 157100
+  },
+  {
+    "title": "海报层级",
+    "file": "assets/10_poster.png",
+    "bytes": 3171410,
+    "optimizedFile": "assets_optimized/10_poster.webp",
+    "optimizedBytes": 413304
+  },
+  {
+    "title": "信息图",
+    "file": "assets/11_infographic.png",
+    "bytes": 3400386,
+    "optimizedFile": "assets_optimized/11_infographic.webp",
+    "optimizedBytes": 417356
+  },
+  {
+    "title": "角色设定表",
+    "file": "assets/12_character_sheet.png",
+    "bytes": 3399301,
+    "optimizedFile": "assets_optimized/12_character_sheet.webp",
+    "optimizedBytes": 392790
+  }
+]

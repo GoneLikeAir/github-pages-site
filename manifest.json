@@ -1,5 +1,24 @@
 [
   {
+    "id": "ai-image-grimoire",
+    "title": "AI 生图魔法书",
+    "description": "翻页式 AI 生图与美术提示词教程：系统学习构图、光线、色彩、镜头、材质、风格和角色设定。",
+    "path": "./pages/ai-image-grimoire/",
+    "createdAt": "2026-06-06",
+    "source": "ai-image-grimoire.html",
+    "encrypted": true,
+    "category": "creative-tutorials",
+    "categoryLabel": "创作教程",
+    "templateId": "custom-static-grimoire",
+    "tags": [
+      "AI生图",
+      "Prompt",
+      "魔法书",
+      "教程",
+      "美术基础"
+    ]
+  },
+  {
     "id": "ai-frontend-grimoire",
     "title": "AI 生成前端魔法书",
     "description": "翻页式 AI 前端提示词教程：把美观页面拆成视觉人格、版式、字体、颜色、组件状态、响应式和审稿迭代。",
