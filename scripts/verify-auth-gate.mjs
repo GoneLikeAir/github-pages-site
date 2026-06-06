@@ -12,7 +12,7 @@ const assert = (condition, message) => {
 const filesToScan = [];
 const walk = (dir) => {
   for (const name of readdirSync(dir)) {
-    if ([".git", "node_modules"].includes(name)) continue;
+    if ([".git", "node_modules", ".env", ".publish-cache"].includes(name)) continue;
     const full = join(dir, name);
     const rel = full.slice(root.length + 1);
     const st = statSync(full);

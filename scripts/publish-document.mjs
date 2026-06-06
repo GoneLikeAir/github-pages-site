@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import { basename, join } from "node:path";
 import { spawn } from "node:child_process";
+import "./load-env.mjs";
 import { categoryLabel, chooseTemplate, fetchTemplates, inferDocMeta, inferPageCategory, inferPageTags, readTemplates, slugify } from "./template-tools.mjs";
 
 const args = parseArgs(process.argv.slice(2));

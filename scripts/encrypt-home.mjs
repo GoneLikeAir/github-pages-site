@@ -1,5 +1,6 @@
 import { writeFileSync } from "node:fs";
 import { webcrypto, randomBytes } from "node:crypto";
+import "./load-env.mjs";
 
 const password = process.env.SITE_PAGE_PASSWORD;
 if (!password) {

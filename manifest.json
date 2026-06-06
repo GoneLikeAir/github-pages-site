@@ -1,5 +1,23 @@
 [
   {
+    "id": "ai-frontend-grimoire",
+    "title": "AI 生成前端魔法书",
+    "description": "翻页式 AI 前端提示词教程：把美观页面拆成视觉人格、版式、字体、颜色、组件状态、响应式和审稿迭代。",
+    "path": "./pages/ai-frontend-grimoire/",
+    "createdAt": "2026-06-06",
+    "source": "ai-frontend-grimoire.html",
+    "encrypted": true,
+    "category": "technical-docs",
+    "categoryLabel": "技术文档",
+    "templateId": "custom-static-grimoire",
+    "tags": [
+      "AI前端",
+      "Prompt",
+      "魔法书",
+      "教程"
+    ]
+  },
+  {
     "id": "windows-codex-gpt-5-5",
     "title": "Windows 安装 Codex 桌面版，并配置中转服务的 GPT-5.5 模型",
     "description": "Windows 安装 Codex 桌面版，并配置中转服务 GPT-5.5 的完整教程。",

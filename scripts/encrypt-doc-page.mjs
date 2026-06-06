@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { webcrypto, randomBytes } from "node:crypto";
+import "./load-env.mjs";
 
 const [,, inputHtmlPath, slug, title, description = ""] = process.argv;
 if (!inputHtmlPath || !slug || !title) {
